@@ -8,12 +8,14 @@ import dev.tocraft.skinshifter.SkinShifter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.ClientAsset;
+import net.minecraft.world.entity.player.PlayerModelType;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
+import net.minecraft.world.item.component.ResolvableProfile;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,18 +47,18 @@ public class SkinPlayerData {
     }
 
     public static @NotNull CompletableFuture<Optional<GameProfile>> getSkinProfile(UUID uuid) {
-        return SkullBlockEntity.fetchGameProfile(uuid);
+        return CompletableFuture.completedFuture(Optional.empty());
     }
 
     public static @NotNull CompletableFuture<Optional<GameProfile>> getSkinProfile(String name) {
-        return SkullBlockEntity.fetchGameProfile(name);
+        return CompletableFuture.completedFuture(Optional.empty());
     }
 
     @Environment(EnvType.CLIENT)
     public static @NotNull CompletableFuture<Optional<PlayerSkin>> getPlayerSkin(Player player) {
         CompletableFuture<Optional<GameProfile>> profileFuture = getSkinProfile(player);
         return profileFuture.thenApply(profile -> {
-            Optional<PlayerSkin> skin = profile.map(gameProfile -> Minecraft.getInstance().getSkinManager().getInsecureSkin(gameProfile));
+            Optional<PlayerSkin> skin = profile.map(gameProfile -> Minecraft.getInstance().getSkinManager().createLookup(gameProfile, false).get());
             if (skin.isEmpty()) {
                 // test if there is a url
                 Optional<CompoundTag> currentUriTag = Optional.ofNullable(PlayerDataRegistry.readTag(player, URI_TAG_NAME, CompoundTag.class));
@@ -67,10 +69,10 @@ public class SkinPlayerData {
                     if (!uri.isEmpty()) {
                         try {
                             URL url = URI.create(uri).toURL();
-                            Optional<ResourceLocation> id = TextureCache.getSkinTextureId(url);
+                            Optional<Identifier> id = TextureCache.getSkinTextureId(url);
 
                             if (id.isPresent()) {
-                                return Optional.of(new PlayerSkin(id.get(), uri, null, null, slim ? PlayerSkin.Model.SLIM : PlayerSkin.Model.WIDE, true));
+                                return Optional.of(new PlayerSkin(new ClientAsset.ResourceTexture(id.get()), null, null, slim ? PlayerModelType.SLIM : PlayerModelType.WIDE, true));
                             }
                         } catch (MalformedURLException e) {
                             LogUtils.getLogger().error("Invalid URI specified: {}", uri, e);

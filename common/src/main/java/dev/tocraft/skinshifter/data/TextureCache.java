@@ -8,7 +8,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
@@ -23,14 +23,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class TextureCache {
-    private static final Map<String, Optional<ResourceLocation>> LOADED_TEXTURES = new ConcurrentHashMap<>();
+    private static final Map<String, Optional<Identifier>> LOADED_TEXTURES = new ConcurrentHashMap<>();
     private static String failedUrl = "";
 
-    public static Optional<ResourceLocation> getSkinTextureId(@NotNull URL textureURL) {
+    public static Optional<Identifier> getSkinTextureId(@NotNull URL textureURL) {
         String urlString = textureURL.toString();
 
         return LOADED_TEXTURES.computeIfAbsent(urlString, url -> {
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+            Identifier id = Identifier.fromNamespaceAndPath(
                     SkinShifter.MODID,
                     "textures/player/skin_" + url.hashCode() + ".png"
             );

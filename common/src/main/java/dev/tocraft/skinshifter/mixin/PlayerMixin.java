@@ -24,7 +24,7 @@ public abstract class PlayerMixin {
     private void onGetName(CallbackInfoReturnable<Component> cir) {
         if (SkinShifter.CONFIG.changeName) {
             CompletableFuture<Optional<GameProfile>> profileFuture = SkinPlayerData.getSkinProfile((Player) (Object) this);
-            profileFuture.getNow(Optional.empty()).ifPresent(profile -> cir.setReturnValue(decorateDisplayNameComponent(Component.literal((profile.getName())))));
+            profileFuture.getNow(Optional.empty()).ifPresent(profile -> cir.setReturnValue(decorateDisplayNameComponent(Component.literal((profile.name())))));
         }
     }
 }
