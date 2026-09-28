@@ -1,0 +1,7 @@
+{
+  "skinshifter.command.set": "已将 %s 的皮肤设置为 %s。",
+  "skinshifter.command.reset": "已重置 %s 的皮肤。",
+  "skinshifter.command.invalid_uri": "SkinShifter: 无效的皮肤链接。",
+  "skinshifter.command.failed": "未能将 %s 的皮肤设置为 %s。",
+  "skinshifter.invalid_player": "无效的玩家名称: %s"
+}
