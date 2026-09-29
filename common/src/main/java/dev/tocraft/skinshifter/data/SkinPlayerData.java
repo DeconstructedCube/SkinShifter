@@ -46,13 +46,30 @@ public class SkinPlayerData {
     }
 
     public static @NotNull CompletableFuture<Optional<GameProfile>> getSkinProfile(UUID uuid) {
-        return CompletableFuture.completedFuture(Optional.empty());
+        if (uuid == null) {
+            return CompletableFuture.completedFuture(Optional.empty());
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            dev.tocraft.craftedcore.platform.PlayerProfile profile = dev.tocraft.craftedcore.platform.PlayerProfile.ofId(uuid);
+            if (profile != null) {
+                return Optional.of(new GameProfile(profile.id(), profile.name()));
+            }
+            return Optional.empty();
+        });
     }
 
     public static @NotNull CompletableFuture<Optional<GameProfile>> getSkinProfile(String name) {
-        return CompletableFuture.completedFuture(Optional.empty());
+        if (name == null || name.isEmpty()) {
+            return CompletableFuture.completedFuture(Optional.empty());
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            dev.tocraft.craftedcore.platform.PlayerProfile profile = dev.tocraft.craftedcore.platform.PlayerProfile.ofName(name);
+            if (profile != null) {
+                return Optional.of(new GameProfile(profile.id(), profile.name()));
+            }
+            return Optional.empty();
+        });
     }
-
     @Environment(EnvType.CLIENT)
     public static @NotNull CompletableFuture<Optional<PlayerSkin>> getPlayerSkin(Player player) {
         CompletableFuture<Optional<GameProfile>> profileFuture = getSkinProfile(player);
