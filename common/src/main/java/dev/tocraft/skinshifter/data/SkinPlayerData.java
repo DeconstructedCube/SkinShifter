@@ -50,24 +50,31 @@ public class SkinPlayerData {
             return CompletableFuture.completedFuture(Optional.empty());
         }
         return CompletableFuture.supplyAsync(() -> {
-            dev.tocraft.craftedcore.platform.PlayerProfile profile = dev.tocraft.craftedcore.platform.PlayerProfile.ofId(uuid);
-            if (profile != null) {
-                return Optional.of(new GameProfile(profile.id(), profile.name()));
+            try {
+                dev.tocraft.craftedcore.platform.PlayerProfile profile = dev.tocraft.craftedcore.platform.PlayerProfile.ofId(uuid);
+                if (profile != null) {
+                    return Optional.of(new GameProfile(profile.id(), profile.name()));
+                }
+            } catch (Exception ignored) {
             }
-            return Optional.empty();
+            return Optional.of(new GameProfile(uuid, ""));
         });
     }
 
     public static @NotNull CompletableFuture<Optional<GameProfile>> getSkinProfile(String name) {
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.trim().isEmpty()) {
             return CompletableFuture.completedFuture(Optional.empty());
         }
+        final String cleanName = name.trim();
         return CompletableFuture.supplyAsync(() -> {
-            dev.tocraft.craftedcore.platform.PlayerProfile profile = dev.tocraft.craftedcore.platform.PlayerProfile.ofName(name);
-            if (profile != null) {
-                return Optional.of(new GameProfile(profile.id(), profile.name()));
+            try {
+                dev.tocraft.craftedcore.platform.PlayerProfile profile = dev.tocraft.craftedcore.platform.PlayerProfile.ofName(cleanName);
+                if (profile != null) {
+                    return Optional.of(new GameProfile(profile.id(), profile.name()));
+                }
+            } catch (Exception ignored) {
             }
-            return Optional.empty();
+            return Optional.of(new GameProfile(net.minecraft.core.UUIDUtil.createOfflinePlayerUUID(cleanName), cleanName));
         });
     }
     @Environment(EnvType.CLIENT)
